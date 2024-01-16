@@ -1,0 +1,30 @@
+name: Node.js CD
+
+on:
+    push:
+        branches: [production]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Deploy
+              uses: rzvezdopadov/forum-example@production
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.PRIVATE_KEY }}
+                  port: 22
+                  script: |
+                      rm -rf ~/forum-example
+
+                      cd ~/
+                      git clone https://github.com/rzvezdopadov/forum-example.git
+
+                      cd ~/forum-example
+                      npm i
+                      npm run build:prod
+
+                      rm -rf ~/../var/www/forum-example/html
+                      mv ~/forum-example/build ~/../var/www/forum-example/html
